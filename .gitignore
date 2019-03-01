@@ -1,0 +1,7 @@
+*.bak
+*~
+testing/out
+.Ds_Store 
+*.orig
+
+
