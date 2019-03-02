@@ -88,3 +88,8 @@ func BuildWithOption(p *PdfData, option *BuildPdfOption) ([]byte, error) {
 	}
 	return Build(p) //default
 }
+
+//ExtractImgs extract image(s) from pdf
+func ExtractImgs(p *PdfData) error {
+	return extractImgs(p)
+}

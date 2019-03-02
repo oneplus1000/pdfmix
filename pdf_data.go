@@ -653,3 +653,49 @@ func (p PdfData) findResourcesOfPage(pageIndex int) (pdfNode, error) {
 	}
 	return resnode, nil
 }
+
+func (p PdfData) countPages() (int, error) {
+	//เริ่ม หา page ที่ต้องการ จาก Type == /Pages
+	var pagesObjID objectID
+	isFoundPagesObj := false
+	for id, nodes := range p.objects {
+		if node, found := nodes.findOneNodeByName("Type"); found && node.content.use == constNodeContentUseString && node.content.str == "/Pages" {
+			pagesObjID = id
+			isFoundPagesObj = true
+			break
+		}
+	}
+
+	if !isFoundPagesObj {
+		return 0, errors.New("not found /Pages")
+	}
+
+	var ok bool
+	var pagesObj *pdfNodes
+	if pagesObj, ok = p.objects[pagesObjID]; !ok {
+		return 0, errors.New("not found /Pages")
+	}
+
+	//เข้าไปดูใน Kids
+	var kidsNode pdfNode
+	if kidsNode, ok = pagesObj.findOneNodeByName("Kids"); !ok {
+		return 0, errors.New("not found /Kids in /Pages")
+	}
+
+	if kidsNode.content.use != constNodeContentUseRefTo {
+		return 0, errors.New("not support yet")
+	}
+
+	var pageObjs *pdfNodes
+	if pageObjs, ok = p.objects[kidsNode.content.refTo]; !ok {
+		return 0, errors.New("not found ref to /Page")
+	}
+
+	count := 0
+	for range *pageObjs {
+		//แต่ละ page
+		count++
+	}
+
+	return count, nil
+}
