@@ -9,9 +9,11 @@ import (
 )
 
 func TestPassword(t *testing.T) {
-	pdfSrc := "testing/pdf/pdf_from_gopdf.pdf"
-	pdfDest := "testing/out/pdf_from_gopdf_pass.pdf"
-	err := passPDF(pdfSrc, pdfDest, PermissionsAll, []byte("1234"), []byte("5555"))
+	//pdfSrc := "testing/pdf/pdf_from_gopdf.pdf"
+	pdfSrc := "testing/pdf/manga.pdf"
+	//pdfDest := "testing/out/pdf_from_gopdf_pass.pdf"
+	pdfDest := "testing/out/manga_pass.pdf"
+	err := passPDF(pdfSrc, pdfDest, PermissionsAll, []byte("1234"), []byte("5555"), false)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}
@@ -54,13 +56,14 @@ func passPDF(
 	permissions int,
 	ownerPass []byte,
 	userPass []byte,
+	withPass bool,
 ) error {
 
 	pdfSrcFile, err := ioutil.ReadFile(pdfSrc)
 	if err != nil {
 		return errors.Wrap(err, "ioutil.ReadFile(...) fail")
 	}
-	pdfDestFile, err := passPDFWithBytes(pdfSrcFile, permissions, ownerPass, userPass)
+	pdfDestFile, err := passPDFWithBytes(pdfSrcFile, permissions, ownerPass, userPass, withPass)
 	if err != nil {
 		return errors.Wrap(err, "passPDFWithBytes(...) fail")
 	}
@@ -76,22 +79,33 @@ func passPDFWithBytes(
 	permissions int,
 	ownerPass []byte,
 	userPass []byte,
+	withPass bool,
 ) ([]byte, error) {
 
 	pdfData, err := Read(pdfSrcFile)
 	if err != nil {
 		return nil, errors.Wrap(err, "ReadPdf(...) fail")
 	}
+	if withPass {
+		pp := PasswordInfo{
+			Permissions: permissions,
+			OwnerPass:   ownerPass,
+			UserPass:    userPass,
+		}
 
-	pp := PasswordInfo{
-		Permissions: permissions,
-		OwnerPass:   ownerPass,
-		UserPass:    userPass,
+		pdfDestFile, err := BuildWithOption(pdfData, &BuildPdfOption{
+			PassProtection: &pp,
+		})
+		if err != nil {
+			return nil, errors.Wrap(err, "BuildWithOption(...) fail")
+		}
+		return pdfDestFile, nil
 	}
-
-	pdfDestFile, err := BuildWithOption(pdfData, &BuildPdfOption{
-		PassProtection: &pp,
-	})
-
+	//without password
+	pdfDestFile, err := Build(pdfData)
+	if err != nil {
+		return nil, errors.Wrap(err, "Build(...) fail")
+	}
 	return pdfDestFile, nil
+
 }
