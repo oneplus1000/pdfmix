@@ -13,7 +13,7 @@ func TestPassword(t *testing.T) {
 	pdfSrc := "testing/pdf/manga.pdf"
 	//pdfDest := "testing/out/pdf_from_gopdf_pass.pdf"
 	pdfDest := "testing/out/manga_pass.pdf"
-	err := passPDF(pdfSrc, pdfDest, PermissionsAll, []byte("1234"), []byte("5555"), false)
+	err := passPDF(pdfSrc, pdfDest, PermissionsAll, []byte("1234"), []byte("5555"), true)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}

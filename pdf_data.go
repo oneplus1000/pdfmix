@@ -70,6 +70,7 @@ func (p *PdfData) findAllPage() (map[int]objectID, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "")
 	}
+
 	return pageIndexs, nil
 }
 
@@ -165,7 +166,9 @@ func (p *PdfData) buildSubsetFont(resObjectIDs map[int]objectID) error {
 
 	for resID := range resIDs {
 		fontNode, err := newQuery(p).findPdfNodeByKeyName(resID, "Font")
-		if err != nil {
+		if err == ErrKeyNameNotFound {
+			continue
+		} else if err != nil {
 			return errors.Wrap(err, "")
 		}
 		fontNodes := p.objects[fontNode.content.refTo]
@@ -545,7 +548,7 @@ func (p PdfData) writeStream(nodes *pdfNodes, id objectID, indexOfStream int, bu
 
 	buff.WriteString("\nstream\n")
 	buff.Write(sm)
-	if sm[len(sm)-1] != 0xA {
+	if len(sm) > 0 && sm[len(sm)-1] != 0xA {
 		buff.WriteString("\n")
 	}
 	buff.WriteString("endstream")

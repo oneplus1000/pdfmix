@@ -132,12 +132,6 @@ func (u *unmarshalHelper) doing(myID objectID, fromRealID uint32, parent pdf.Val
 				}
 
 			} else {
-
-				//debug
-				if childRefID == 1932 {
-					x := 1
-					_ = x
-				}
 				//fmt.Printf("childRefID: %+v\n", childRefID)
 				isDup := false
 				childRefObjID := createRealObjectID(childRefID)
@@ -397,4 +391,4 @@ func digit(n string, digit int) string {
 }
 
 var printDebugStream = false
-var printDebug = true
+var printDebug = false
