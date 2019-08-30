@@ -10,10 +10,27 @@ import (
 
 func TestPassword(t *testing.T) {
 	//pdfSrc := "testing/pdf/pdf_from_gopdf.pdf"
-	pdfSrc := "testing/pdf/manga.pdf"
+	//pdfSrc := "testing/pdf/manga.pdf"
 	//pdfDest := "testing/out/pdf_from_gopdf_pass.pdf"
-	pdfDest := "testing/out/manga_pass.pdf"
-	err := passPDF(pdfSrc, pdfDest, PermissionsAll, []byte("1234"), []byte("5555"), true)
+	///pdfDest := "testing/out/manga_pass.pdf"
+	usePass := true //ใช้ password
+
+	err := passPDF("testing/pdf/Inuyashiki_11.pdf", "testing/out/Inuyashiki_11_pass.pdf", PermissionsAll, []byte("1234"), []byte("5555"), usePass)
+	if err != nil {
+		t.Fatalf("%+v", err)
+	}
+
+	err = passPDF("testing/pdf/Inuyashiki.pdf", "testing/out/Inuyashiki_pass.pdf", PermissionsAll, []byte("1234"), []byte("5555"), usePass)
+	if err != nil {
+		t.Fatalf("%+v", err)
+	}
+
+	err = passPDF("testing/pdf/manga.pdf", "testing/out/manga_pass.pdf", PermissionsAll, []byte("1234"), []byte("5555"), usePass)
+	if err != nil {
+		t.Fatalf("%+v", err)
+	}
+
+	err = passPDF("testing/pdf/pdf_from_gopdf.pdf", "testing/out/pdf_from_gopdf_pass.pdf", PermissionsAll, []byte("1234"), []byte("5555"), usePass)
 	if err != nil {
 		t.Fatalf("%+v", err)
 	}

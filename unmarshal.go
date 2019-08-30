@@ -97,6 +97,11 @@ func (u *unmarshalHelper) doing(myID objectID, fromRealID uint32, parent pdf.Val
 		parentSize = len(parentKeys)
 	}
 
+	if myID.id == 60 {
+		x := 1
+		_ = x
+	}
+
 	for i := 0; i < parentSize; i++ {
 
 		var child pdf.Value
@@ -117,7 +122,7 @@ func (u *unmarshalHelper) doing(myID objectID, fromRealID uint32, parent pdf.Val
 				fakeRefObjID := createFakeObjectID(u.nextFakeID())
 				if parentKind == pdf.Array {
 					u.pushItemRef(myID, i, fakeRefObjID)
-				} else if parentKind == pdf.Dict {
+				} else if parentKind == pdf.Dict || parentKind == pdf.Stream {
 					u.pushRef(myID, childKey, fakeRefObjID)
 				}
 				err := u.doing(fakeRefObjID, fromRealID, child)
