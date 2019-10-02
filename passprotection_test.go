@@ -126,3 +126,22 @@ func passPDFWithBytes(
 	return pdfDestFile, nil
 
 }
+
+/*
+func TestPassword2(t *testing.T) {
+	usePass := true //ใช้ password
+	//src := "../../../../testing/pdf/Inuyashiki.pdf"
+	//dest := "../../../../testing/out/Inuyashiki.pdf"
+	src := "/Users/oneplus/Desktop/G2P4YO46D38IUQTI.pdf"
+	dest := "/Users/oneplus/Desktop/G2P4YO46D38IUQTI_out.pdf"
+	_, err := os.Open(src)
+	if err != nil {
+		t.Fatalf("%+v", err)
+	}
+	err = passPDF(src, dest, PermissionsAll, []byte("1234"), []byte("5555"), usePass)
+	if err != nil {
+		t.Fatalf("%+v", err)
+	}
+
+}
+*/

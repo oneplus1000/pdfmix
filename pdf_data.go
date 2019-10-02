@@ -5,10 +5,8 @@ import (
 	"compress/zlib"
 	"fmt"
 	"io"
-	"regexp"
 	"sort"
 	"strconv"
-	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -205,19 +203,49 @@ func (p *PdfData) buildSubsetFont(resObjectIDs map[int]objectID) error {
 
 func (p *PdfData) fontnameExtract(fontname string) (string, int, error) {
 
-	rex := regexp.MustCompile("[0-9]+")
-	if !rex.MatchString(fontname) {
-		return "", 0, fmt.Errorf("can not parse %s", fontname)
+	/*
+		rex := regexp.MustCompile("[0-9]+")
+		if !rex.MatchString(fontname) {
+			return "", 0, fmt.Errorf("can not parse %s", fontname)
+		}
+
+		fname := rex.ReplaceAllString(fontname, "")
+
+		findex, err := strconv.Atoi(strings.Replace(fontname, fname, "", -1))
+		if err != nil {
+			return "", 0, errors.Wrap(err, "")
+		}
+
+		return fname, findex, nil
+	*/
+	offset := -1
+	rs := []rune(fontname)
+	max := len(rs)
+	for i := max - 1; i >= 0; i-- {
+		c := string(rs[i])
+		if _, err := strconv.Atoi(c); err != nil {
+			offset = i
+			break
+		}
 	}
 
-	fname := rex.ReplaceAllString(fontname, "")
+	if offset == -1 {
+		//fontname is number
+		findex, err := strconv.Atoi(fontname)
+		if err != nil {
+			return "", 0, errors.Wrap(err, "")
+		}
+		return "", findex, nil
+	}
 
-	findex, err := strconv.Atoi(strings.Replace(fontname, fname, "", -1))
+	fName := fontname[0 : offset+1]
+	fIndexStr := fontname[offset+1:]
+	findex, err := strconv.Atoi(fIndexStr)
 	if err != nil {
 		return "", 0, errors.Wrap(err, "")
 	}
 
-	return fname, findex, nil
+	return fName, findex, nil
 }
 
 func (p *PdfData) buildContent(contentObjectIDs map[int]objectID) error {
