@@ -164,7 +164,7 @@ func (p *PdfData) buildSubsetFont(resObjectIDs map[int]objectID) error {
 
 	for resID := range resIDs {
 		fontNode, err := newQuery(p).findPdfNodeByKeyName(resID, "Font")
-		if err == ErrKeyNameNotFound {
+		if err == ErrKeyNameNotFound || err == ErrObjectIDNotFound {
 			continue
 		} else if err != nil {
 			return errors.Wrap(err, "")

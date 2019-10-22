@@ -9,6 +9,7 @@ import (
 func TestReadPdf(t *testing.T) {
 	//printDebugStream = true
 	//printDebug = true
+	//fp := "/Users/oneplus/Desktop/xxx.pdf"
 	fp := "testing/out/pdf_from_gopdf_itext3 copy.pdf"
 	b, err := ioutil.ReadFile(fp)
 	if err != nil {

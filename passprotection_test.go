@@ -3,6 +3,7 @@ package pdfmix
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/pkg/errors"
@@ -127,13 +128,12 @@ func passPDFWithBytes(
 
 }
 
-/*
 func TestPassword2(t *testing.T) {
 	usePass := true //ใช้ password
-	//src := "../../../../testing/pdf/Inuyashiki.pdf"
-	//dest := "../../../../testing/out/Inuyashiki.pdf"
-	src := "/Users/oneplus/Desktop/G2P4YO46D38IUQTI.pdf"
-	dest := "/Users/oneplus/Desktop/G2P4YO46D38IUQTI_out.pdf"
+	src := "../../../../testing/pdf/Inuyashiki.pdf"
+	dest := "../../../../testing/out/Inuyashiki.pdf"
+	//src := "/Users/oneplus/Desktop/xxx.pdf"
+	//dest := "/Users/oneplus/Desktop/xxx_out.pdf"
 	_, err := os.Open(src)
 	if err != nil {
 		t.Fatalf("%+v", err)
@@ -144,4 +144,3 @@ func TestPassword2(t *testing.T) {
 	}
 
 }
-*/
