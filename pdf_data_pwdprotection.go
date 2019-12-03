@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"crypto/rc4"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -41,7 +42,52 @@ func (p *PdfData) pwdProtection(passInfo *PasswordInfo) error {
 	return nil
 }
 
+func extractHexStringForEncrypt(str string) (string, bool) {
+	r := []rune(str)
+	size := len(r)
+	if size <= 2 {
+		return "", false
+	}
+	var buff bytes.Buffer
+	if r[0] == '<' && r[size-1] == '>' {
+		for i := 1; i < size-1; i++ {
+			buff.WriteString(fmt.Sprintf("%s", string(r[i])))
+		}
+	}
+	return buff.String(), true
+}
+
+func (p *PdfData) readTrailerID() ([]byte, error) {
+	idOfTrailer := createRealObjectID(uint32(0)) //id ของ trailer คือ 0 แน่นอน
+	trailerIDNode, err := newQuery(p).findPdfNodeByKeyName(idOfTrailer, "ID")
+	if err == ErrKeyNameNotFound || err == ErrObjectIDNotFound {
+		return nil, nil //ok ไม่เจอก็ข้ามไป
+	} else if err != nil {
+		return nil, errors.Wrap(err, "")
+	} else {
+		if trailerIDNode.content.use == constNodeKeyUseIndex {
+			idNodes := p.objects[trailerIDNode.content.refTo]
+			for _, idNode := range *idNodes {
+				if idNode.key.use == constNodeKeyUseIndex &&
+					idNode.content.use == constNodeContentUseString {
+					id, ok := extractHexStringForEncrypt(idNode.content.str)
+					if ok {
+						return hex.DecodeString(id)
+					}
+				}
+				break //ใช้แค่อันแรก
+			}
+		}
+	}
+	return nil, nil
+}
+
 func (p *PdfData) createEncryptNodes(passInfo *PasswordInfo) (pdfNodes, []byte, error) {
+
+	trailerID, err := p.readTrailerID()
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "")
+	}
 
 	userPass := passInfo.UserPass
 	ownerPass := passInfo.OwnerPass
@@ -58,7 +104,7 @@ func (p *PdfData) createEncryptNodes(passInfo *PasswordInfo) (pdfNodes, []byte, 
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "")
 	}
-	uValue, encryptionKey, err := createPwdProtectionUValue(userPassWithPadding, oValue, protection)
+	uValue, encryptionKey, err := createPwdProtectionUValue(userPassWithPadding, oValue, trailerID, protection)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "")
 	}
@@ -134,7 +180,7 @@ func createPwdProtectionOValue(userPassWithPadding []byte, ownerPassWithPadding 
 	return dest, nil
 }
 
-func createPwdProtectionUValue(userPassWithPadding []byte, oValue []byte, protection int) ([]byte, []byte, error) {
+func createPwdProtectionUValue(userPassWithPadding []byte, oValue []byte, trailerID []byte, protection int) ([]byte, []byte, error) {
 
 	var tmp bytes.Buffer
 	tmp.Write(userPassWithPadding)
@@ -143,6 +189,9 @@ func createPwdProtectionUValue(userPassWithPadding []byte, oValue []byte, protec
 	tmp.WriteByte(byte(0xff))
 	tmp.WriteByte(byte(0xff))
 	tmp.WriteByte(byte(0xff))
+	if trailerID != nil {
+		tmp.Write(trailerID)
+	}
 
 	tmp2 := md5.Sum(tmp.Bytes())
 	encryptionKey := tmp2[0:5]

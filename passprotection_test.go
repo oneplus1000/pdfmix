@@ -130,10 +130,10 @@ func passPDFWithBytes(
 
 func TestPassword2(t *testing.T) {
 	usePass := true //ใช้ password
-	src := "../../../../testing/pdf/Inuyashiki.pdf"
-	dest := "../../../../testing/out/Inuyashiki.pdf"
-	//src := "/Users/oneplus/Desktop/xxx.pdf"
-	//dest := "/Users/oneplus/Desktop/xxx_out.pdf"
+	src := "./testing/pdf/Inuyashiki.pdf"
+	dest := "./testing/out/Inuyashiki.pdf"
+	//src := "/Users/oneplus/Downloads/jj2.pdf"
+	//dest := "/Users/oneplus/Downloads/jj2_mix.pdf"
 	_, err := os.Open(src)
 	if err != nil {
 		t.Fatalf("%+v", err)
